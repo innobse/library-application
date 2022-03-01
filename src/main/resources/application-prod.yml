@@ -1,0 +1,4 @@
+myConfig:
+  logger:
+    console:
+      prefix: 'prod log:'
