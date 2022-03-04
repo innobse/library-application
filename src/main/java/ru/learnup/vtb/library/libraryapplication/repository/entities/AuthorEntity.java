@@ -42,8 +42,8 @@ import java.util.Collection;
 public class AuthorEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "books_id_seq", sequenceName = "books_id_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "authors_id_seq")
+    @SequenceGenerator(name = "authors_id_seq", sequenceName = "authors_id_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "name", length = 64)

@@ -6,6 +6,11 @@
     </head>
     <body>
         <h1>Список авторов:</h1>
+
+        <br />
+        <a href="/authors/?view=tableAuthors">Отобразить таблицей</a>
+        <br />
+
         <ul type="square">
             <c:forEach var="obj" items="${objects}">
                 <li><a href="/authors/${obj.id}">${obj.name}</a></li>

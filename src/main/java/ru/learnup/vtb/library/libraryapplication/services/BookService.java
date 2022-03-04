@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+import ru.learnup.vtb.library.libraryapplication.model.Author;
 import ru.learnup.vtb.library.libraryapplication.model.Book;
 import ru.learnup.vtb.library.libraryapplication.repository.JpaBookRepository;
 import ru.learnup.vtb.library.libraryapplication.repository.entities.AuthorEntity;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Description
@@ -49,97 +51,29 @@ public class BookService implements ApplicationContextAware {
         this.repository = repository;
     }
 
-    public void printAll() {
-
-        repository.findAll().forEach(System.out::println);
-    }
-
-    public void printAllLike(String pattern) {
-        for (BookEntity bookEntity : repository.getMyFilteredResult(pattern)) {
-            System.out.println(bookEntity);
-        }
-    }
-
-    @Transactional
-    public void rename(long id, String newName) {
-        try {
-            final BookEntity forUpdate = repository.getForUpdate(id);
-            System.out.println("Объект получен");
-
-            forUpdate.setName(newName);
-
-            Thread.sleep(1000);
-            repository.save(forUpdate);
-            System.out.println("Объект записан");
-
-        } catch (InterruptedException e) {
-
-        } catch (DataAccessException err) {
-            System.out.println("Объект уже был изменен!");
-        }
-    }
-
-    @Transactional(
-            propagation = Propagation.REQUIRED,
-            isolation = Isolation.DEFAULT,
-            timeout = 2,
-            readOnly = false,
-            rollbackFor = {
-                    IOException.class,
-                    FileNotFoundException.class,
-                    EOFException.class
-            },
-            noRollbackFor = {RuntimeException.class}
-    )
-    public void demo(AuthorEntity authorEntity) throws EOFException {
-
-
-
-//        final BookEntity targetBook = new BookEntity(null, "999", authorEntity);
-//
-//        final BookEntity newBook = repository.save(
-//                targetBook);
-//
-//        targetBook.setName("444");
-//        targetBook.setId(newBook.getId());
-//
-////            Thread.sleep(3000);
-//
-//
-//        repository.save(newBook);
-//        throw new RuntimeException();
+    public List<Book> getAll() {
+        return toDomain(
+                repository.findAll());
 
     }
 
-//    public void save(Book book) {
-//        repository.save(
-//                new BookEntity(null, book.getName(), new AuthorEntity(null, book.getAuthor().getName(), null)));
-//    }
-
-    public void delete(long bookId) {
-        repository.deleteById(bookId);
+    public List<Book> getAllByAuthor(Author author) {
+        return toDomain(
+                repository.findAllByAuthor_Id(author.getId()));
     }
 
-    public void error() {
-        throw new RuntimeException("УПС!");
+    private static List<Book> toDomain(List<BookEntity> entities) {
+        return entities.stream()
+                .map(BookService::toDomain)
+                .collect(Collectors.toList());
     }
 
-    @PostConstruct
-    public void init() {
-        System.out.println(this.getClass().getSimpleName() + " успешно создан");
-    }
-
-    @PreDestroy
-    public void ustroyDestroy() {
-        System.out.println(this.getClass().getSimpleName() + " готовится к уничтожению");
+    private static Book toDomain(BookEntity entity) {
+        return new Book(entity.getName(), AuthorService.toDomain(entity.getAuthor()));
     }
 
     @Override
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         this.ctx = ctx;
-    }
-
-    public List<BookEntity> getAll() {
-        return repository.findAll();
     }
 }

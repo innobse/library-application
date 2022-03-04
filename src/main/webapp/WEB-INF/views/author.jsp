@@ -5,19 +5,11 @@
 
     </head>
     <body>
-        <h1>Список книг:</h1>
-        <table border="1px">
+        <h1>${author}</h1>
+        <ul type="square">
             <c:forEach var="book" items="${books}">
-                <tr>
-                    <td width="40%">
-                            ${book.author.name}
-                    </td>
-                    <td width="60%">
-                            ${book.name}
-                    </td>
-                </tr>
+                <li>${book.name}</li>
             </c:forEach>
-
-        </table>
+        </ul>
     </body>
 </html>

@@ -5,11 +5,12 @@
 
     </head>
     <body>
-        <h1>${author}</h1>
-        <ul type="square">
-            <c:forEach var="book" items="${books}">
-                <li>${book.name}</li>
-            </c:forEach>
-        </ul>
+        <h1>Новый автор:</h1>
+        <form method="POST" action="/authors/new" id="newAuthor" name="newAuthor" enctype="multipart/form-data">
+            <input type="number" id="id" name="id" value="" hidden />
+            <input type="text" id="name" name="name" value="Имя автора" />
+            <br />
+            <input type="submit" id="btnAddAuthor" name="btnAddAuthor" value="Add New Author" />
+        </form>
     </body>
 </html>

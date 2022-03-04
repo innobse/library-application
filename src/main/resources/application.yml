@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 myConfig:
   logger:
     console:
@@ -20,3 +23,7 @@ spring:
           use_second_level_cache: true
           region.factory_class: 'org.hibernate.cache.jcache.internal.JCacheRegionFactory'
           use_query_cache: true
+
+logging:
+  level:
+    org.springframework.web: debug

@@ -21,6 +21,8 @@ public interface JpaBookRepository extends JpaRepository<BookEntity, Long> {
 
     List<BookEntity> findAllByNameLikeOrderById(String namePattern);
 
+    List<BookEntity> findAllByAuthor_Id(long id);
+
     @Query(name = "book.findlikename")
     List<BookEntity> getMyFilteredResult(String pattern);
 
