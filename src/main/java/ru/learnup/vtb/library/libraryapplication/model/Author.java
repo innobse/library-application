@@ -3,6 +3,8 @@ package ru.learnup.vtb.library.libraryapplication.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * Description
  *

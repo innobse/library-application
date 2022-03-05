@@ -1,16 +1,23 @@
 package ru.learnup.vtb.library.libraryapplication.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.hateoas.Link;
 import org.springframework.web.bind.annotation.*;
+import ru.learnup.vtb.library.libraryapplication.controllers.dto.AuthorDto;
+import ru.learnup.vtb.library.libraryapplication.controllers.dto.ExceptionDto;
+import ru.learnup.vtb.library.libraryapplication.mappers.MyMapper;
 import ru.learnup.vtb.library.libraryapplication.model.Author;
 import ru.learnup.vtb.library.libraryapplication.model.Book;
 import ru.learnup.vtb.library.libraryapplication.services.AuthorService;
 import ru.learnup.vtb.library.libraryapplication.services.BookService;
 
+import java.util.Collection;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * Description
@@ -19,45 +26,60 @@ import java.util.List;
  * Created on 01.03.2022
  * @since
  */
-@Controller
-@RequestMapping("/authors")
+@RestController
+@RequestMapping("/api/v1/authors")
 public class AuthorController {
 
     private AuthorService authorService;
     private BookService bookService;
+    private MyMapper authorMapper;
 
     @Autowired
-    public AuthorController(AuthorService service, BookService bookService) {
+    public AuthorController(AuthorService service, BookService bookService, MyMapper authorMapper) {
         this.authorService = service;
         this.bookService = bookService;
+        this.authorMapper = authorMapper;
     }
 
     @GetMapping
-    public String showAll(@RequestParam("view") @Nullable String view, Model model) {
+    public Collection<AuthorDto> getAll() {
         List<Author> authors = authorService.getAll();
-        model.addAttribute("objects", authors);
-        return view == null ? "listAuthors" : view;
+        return authors.stream()
+                .map(authorMapper::toDto)
+                .map(result -> {
+
+                    result.add(linkTo(methodOn(AuthorController.class).get(result.getId())).withSelfRel());
+                    return result;
+                })
+                .collect(toList());
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable("id") long id, Model model) {
+    public AuthorDto get(@PathVariable("id") long id) {
         Author author = authorService.get(id);
-        List<Book> books = bookService.getAllByAuthor(author);
+//        List<Book> books = bookService.getAllByAuthor(author);
 
-        model.addAttribute("author", author.getName());
-        model.addAttribute("books", books);
+        final AuthorDto result = authorMapper.toDto(author);
 
-        return "author";
+
+
+        return result;
     }
 
-    @PostMapping("/new")
-    public String add(@ModelAttribute Author author, Model model) {
-        authorService.add(author);
-        return "redirect:/authors";
+    @PostMapping
+    public Long create(@RequestBody AuthorDto authorDto) {
+        return authorService.add(
+                authorMapper.toDomain(authorDto));
     }
 
-    @GetMapping("/new")
-    public String addPage() {
-        return "newAuthor";
+    @PutMapping("/{id}")
+    public void update(@PathVariable("id") long id, @RequestBody AuthorDto authorDto) {
+        authorService.update(
+                authorMapper.toDomain(authorDto));
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable("id") long id) {
+        authorService.deleteById(id);
     }
 }

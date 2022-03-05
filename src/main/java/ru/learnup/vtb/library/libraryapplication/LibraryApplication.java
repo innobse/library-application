@@ -21,13 +21,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @SpringBootApplication
-@EntityScan({"ru.learnup.vtb.library.libraryapplication.repository.entities"})
-@EnableCaching
 public class LibraryApplication {
 
     public static void main(String[] args) {
-        final ConfigurableApplicationContext ctx = SpringApplication.run(LibraryApplication.class, args);
-        System.out.println(ctx.getBean(ViewResolver.class));
+        SpringApplication.run(LibraryApplication.class, args);
 
 
     }
