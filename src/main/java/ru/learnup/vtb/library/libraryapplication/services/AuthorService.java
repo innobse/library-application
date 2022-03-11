@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.learnup.vtb.library.libraryapplication.mappers.MyMapper;
@@ -11,6 +14,7 @@ import ru.learnup.vtb.library.libraryapplication.model.Author;
 import ru.learnup.vtb.library.libraryapplication.repository.JpaAuthorRepository;
 import ru.learnup.vtb.library.libraryapplication.repository.entities.AuthorEntity;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,13 +81,14 @@ public class AuthorService {
         System.out.println(repository.findById(id));
     }
 
-
+    @RolesAllowed({"ROLE_USER"})
     public List<Author> getAll() {
         return repository.findAll().stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
 
+    @Secured({"ROLE_USER"})
     public Author get(long id) {
         return mapper.toDomain(
                 repository.getById(id));
@@ -99,6 +104,7 @@ public class AuthorService {
 //        return new Author(entity.getId(), entity.getName());
 //    }
 
+    @PreAuthorize("hasAnyRole(\"ADMIN\", \"USER\")")
     public void deleteById(long id) {
         repository.deleteById(id);
     }

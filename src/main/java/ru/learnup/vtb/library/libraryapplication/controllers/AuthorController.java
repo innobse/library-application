@@ -3,6 +3,7 @@ package ru.learnup.vtb.library.libraryapplication.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.learnup.vtb.library.libraryapplication.controllers.dto.AuthorDto;
 import ru.learnup.vtb.library.libraryapplication.controllers.dto.ExceptionDto;
@@ -42,6 +43,7 @@ public class AuthorController {
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public Collection<AuthorDto> getAll() {
         List<Author> authors = authorService.getAll();
         return authors.stream()
